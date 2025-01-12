@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Na Chapa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pedidos Na Chapa</title>
     <link rel="icon" href="https://www.wedely.com/file/bf0abf4aa17850bfcbc52fe0b927993f2e4fd99924293457a324f5eda4c0a83a" type="image/x-icon">
     
     <!-- Web App Meta Tags -->
@@ -247,17 +247,21 @@
                 });
 
                 var observacao = $("textarea").val();
-                var mensagem = "Pedido de compra :\n" + insumosSelecionados.join("\n");
+                if (insumosSelecionados.length > 0 || observacao.trim() !== "") {
+                    var mensagem = "Pedido de compra :\n" + insumosSelecionados.join("\n");
 
-                if (observacao) {
-                    mensagem += "\n\nInformações adicionais:\n" + observacao;
-                }
+                    if (observacao) {
+                        mensagem += "\n\nInformações adicionais:\n" + observacao;
+                    }
 
-                if (insumosSelecionados.length > 0) {
                     var url = "https://wa.me/?text=" + encodeURIComponent(mensagem);
                     window.open(url, "_blank");
+
+                    // Limpar checkboxes e caixa de texto
+                    $("input[name='insumos']").prop("checked", false);
+                    $("textarea").val("");
                 } else {
-                    alert("Selecione pelo menos um item.");
+                    alert("Selecione pelo menos um item ou adicione uma observação.");
                 }
             });
         });
