@@ -248,10 +248,18 @@
 
                 var observacao = $("textarea").val();
                 if (insumosSelecionados.length > 0 || observacao.trim() !== "") {
-                    var mensagem = "Pedido de compra :\n" + insumosSelecionados.join("\n");
-
+                    
+                    var mensagem = "*Pedido de compra*";
+                    
+                    if (insumosSelecionados.length > 0){
+                       mensagem = "*Pedido de compra*\n\n" + insumosSelecionados.join("\n");
+                    }
+                    
                     if (observacao) {
-                        mensagem += "\n\nInformações adicionais:\n" + observacao;
+
+                       if (insumosSelecionados.length > 0){mensagem += "\n\n*Pedidos adicionais*";}
+
+                        mensagem += "\n\n" + observacao;
                     }
 
                     var url = "https://wa.me/?text=" + encodeURIComponent(mensagem);
