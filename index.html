@@ -7,7 +7,7 @@
     <link rel="icon" href="https://www.wedely.com/file/bf0abf4aa17850bfcbc52fe0b927993f2e4fd99924293457a324f5eda4c0a83a" type="image/x-icon">
     
     <!-- Web App Meta Tags -->
-    <meta name="apple-mobile-web-app-title" content="Na Chapa">
+    <meta name="apple-mobile-web-app-title" content="Pedido Na Chapa">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#128C7E">
@@ -27,9 +27,9 @@
 
         .content {
             flex: 1;
-            overflow-y: auto; /* Permite o scroll do conteúdo */
+            overflow-y: auto;
             padding: 20px;
-            padding-bottom: 100px; /* Espaço para o botão fixo */
+            padding-bottom: 150px; /* Espaço para o botão fixo */
         }
 
         .top-container {
@@ -53,11 +53,13 @@
             margin-top: 15px;
         }
 
-        .insumos-container {
-            padding: 20px;
-            background-color: #fff;
-            box-sizing: border-box;
-            margin-top: 15px;
+        .category {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 10px;  
+            color: #128C7E;
+            text-align: left;
         }
 
         .insumos-container .card {
@@ -77,6 +79,23 @@
             color: #555;
         }
 
+        /* Estilo da caixa de texto */
+        .observacao-container {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #128C7E;
+        }
+
+        .observacao-container textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            resize: none;
+            box-sizing: border-box;
+        }
+
         .button-container {
             position: fixed;
             bottom: 0;
@@ -94,7 +113,7 @@
             background-color: #128C7E;
             color: white;
             border: none;
-            border-radius: 10px; /* bordas arredondadas */
+            border-radius: 10px;
             cursor: pointer;
             font-size: 18px;
             display: flex;
@@ -105,7 +124,7 @@
 
         .button-container button .fab {
             margin-right: 10px;
-            font-size: 20px; /* Aumenta o tamanho do ícone do WhatsApp */
+            font-size: 20px;
         }
 
         .button-container button:hover {
@@ -127,56 +146,91 @@
     </style>
 </head>
 <body>
-    <!-- Content area: Everything is scrollable, including header -->
     <div class="content">
         <div class="top-container">
             <img src="https://www.wedely.com/file/bf0abf4aa17850bfcbc52fe0b927993f2e4fd99924293457a324f5eda4c0a83a" alt="Logo Na Chapa">
             <h1>Pedidos Na Chapa</h1>
         </div>
 
-        <!-- Insumos container: Items selection with scroll -->
         <div class="insumos-container">
+            <!-- Carnes -->
+            <div class="category">Carnes</div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Hambúrguer"> Hambúrguer</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Picanha"> Picanha</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Maminha"> Maminha</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Bacon"> Bacon</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Asa de frango"> Asa de frango</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Peito de Frango"> Peito de Frango</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="File de Peixe"> File de Peixe</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Carne de porco para bifana"> Carne de porco para bifana</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Carne moida"> Carne moida</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Hambúrguer Enfant"> Hambúrguer Enfant</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Nugget de frango"> Nugget de frango</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Hambúrguer Vegetariano"> Hambúrguer Vegetariano</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Jambon"> Jambon</label></div>
+
+            <!-- Molhos de Queijo -->
+            <div class="category">Molhos de Queijo</div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Creme culinário 15%"> Creme culinário 15%</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Creme culinário 30%"> Creme culinário 30%</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Gorgonzola"> Gorgonzola</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Cheddar Râpé"> Cheddar Râpé</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Cheddar Fatia"> Cheddar Fatia</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Gouda Fatia"> Gouda Fatia</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Provolone"> Provolone</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Emental Râpé"> Emental Râpé</label></div>
+
+            <!-- Hortifruti -->
+            <div class="category">Hortifruti</div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Banana"> Banana</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Morango"> Morango</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Salada"> Salada</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Cenoura"> Cenoura</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Tomate"> Tomate</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Pimentão Vermelho"> Pimentão Vermelho</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Pimentão Amarelo"> Pimentão Amarelo</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Cebola"> Cebola</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Persil"> Persil</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Limão"> Limão</label></div>
+
+            <!-- Sobremesas -->
+            <div class="category">Sobremesas</div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Açai"> Açai</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Chocolate meio amargo"> Chocolate meio amargo</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Chocolate ao leite"> Chocolate ao leite</label></div>
+
+            <!-- Outros -->
+            <div class="category">Outros</div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Granola"> Granola</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Manteiga"> Manteiga</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Azeite Salada"> Azeite Salada</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Óleo fritura"> Óleo fritura</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Mostarda Amarela"> Mostarda Amarela</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Ovos"> Ovos</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Sal (Neve)"> Sal (Neve)</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Sal (Grosso)"> Sal (Grosso)</label></div>
+
+            <!-- Temperos -->
+            <div class="category">Temperos</div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Páprica"> Páprica</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Alho em pó"> Alho em pó</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Pimenta do reino"> Pimenta do reino</label></div>
+
+            <!-- Limpeza -->
+            <div class="category">Limpeza</div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Desengordurante chapa"> Desengordurante chapa</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Detergente"> Detergente</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Sabão máquina de lavar"> Sabão máquina de lavar</label></div>
+            <div class="card"><label><input type="checkbox" name="insumos" value="Desinfetante para o chão"> Desinfetante para o chão</label></div>
+
+            <!-- Observação -->
+            <div class="category">Informações adicionais</div>
             <div class="card">
-                <label><input type="checkbox" name="insumos" value="Tomate"> Tomate</label>
+                <textarea rows="4" style="width: 100%; border: unset;" placeholder="Adicione algo que falta na lista..."></textarea>
             </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Salada"> Salada</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Queijo"> Queijo</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Carne"> Carne</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Hamburguer"> Hamburguer</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Alface"> Alface</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Frango"> Frango</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Arroz"> Arroz</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Feijão"> Feijão</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Batata"> Batata</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Cebola"> Cebola</label>
-            </div>
-            <div class="card">
-                <label><input type="checkbox" name="insumos" value="Alho"> Alho</label>
-            </div>
-            <!-- Adicione mais itens conforme necessário -->
         </div>
     </div>
 
-    <!-- Fixed button at the bottom -->
     <div class="button-container">
         <button type="button" id="enviarPedido">
             <i class="fab fa-whatsapp"></i> Enviar Pedido
@@ -192,10 +246,14 @@
                     insumosSelecionados.push($(this).val());
                 });
 
-                if (insumosSelecionados.length > 0) {
-                    var mensagem = "Pedido de Insumos:\n" + insumosSelecionados.join("\n");
+                var observacao = $("textarea").val();
+                var mensagem = "Pedido de compra :\n" + insumosSelecionados.join("\n");
 
-                    // Apenas abre o WhatsApp sem especificar um número fixo
+                if (observacao) {
+                    mensagem += "\n\nInformações adicionais:\n" + observacao;
+                }
+
+                if (insumosSelecionados.length > 0) {
                     var url = "https://wa.me/?text=" + encodeURIComponent(mensagem);
                     window.open(url, "_blank");
                 } else {
