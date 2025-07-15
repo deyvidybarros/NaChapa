@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedidos Na Chapa</title>
     <link rel="icon" href="https://www.wedely.com/file/bf0abf4aa17850bfcbc52fe0b927993f2e4fd99924293457a324f5eda4c0a83a" type="image/x-icon">
     
@@ -12,267 +12,1545 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#128C7E">
     <link rel="apple-touch-icon" href="https://www.wedely.com/file/bf0abf4aa17850bfcbc52fe0b927993f2e4fd99924293457a324f5eda4c0a83a">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    
+    <!-- CDNs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+        /* Custom styles that Tailwind can't handle easily */
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 150px; /* Espaço para o botão fixo */
+        
+        .quantity-btn {
+            transition: all 0.2s ease;
         }
-
-        .top-container {
-            text-align: center;
-            background-color: #fff;
-            box-sizing: border-box;
-            padding: 20px;
-            position: relative;
-            z-index: 10;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        
+        .quantity-btn:active {
+            transform: scale(0.9);
         }
-
-        .top-container img {
-            max-width: 150px;
-            height: auto;
+        
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(18, 140, 126, 0.3);
         }
-
-        h1 {
-            color: #333;
-            font-size: 24px;
-            margin-top: 15px;
+        
+        /* Animation for category collapse */
+        .category-content {
+            transition: max-height 0.3s ease-out;
+            overflow: hidden;
         }
-
-        .category {
-            font-weight: bold;
-            font-size: 18px;
-            margin-top: 20px;
-            margin-bottom: 10px;  
-            color: #128C7E;
-            text-align: left;
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        .insumos-container .card {
-            background-color: #ffffff;
-            border: 1px solid #ddd;
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
             border-radius: 10px;
-            margin-bottom: 15px;
-            padding: 10px;
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
-
-        .insumos-container label {
-            font-size: 16px;
-            color: #555;
-        }
-
-        /* Estilo da caixa de texto */
-        .observacao-container {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #128C7E;
-        }
-
-        .observacao-container textarea {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
+        
+        ::-webkit-scrollbar-thumb {
+            background: #128C7E;
             border-radius: 10px;
-            border: 1px solid #ddd;
-            resize: none;
-            box-sizing: border-box;
         }
-
-        .button-container {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            padding: 15px;
-            background-color: #128C7E;
-            text-align: center;
-            box-sizing: border-box;
-            z-index: 20;
-        }
-
-        .button-container button {
-            width: 100%;
-            padding: 15px;
-            background-color: #128C7E;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-        }
-
-        .button-container button .fab {
-            margin-right: 10px;
-            font-size: 20px;
-        }
-
-        .button-container button:hover {
-            background-color: #128C7E;
-        }
-
-        @media (max-width: 600px) {
-            .top-container {
-                padding: 15px;
-            }
-            h1 {
-                font-size: 20px;
-            }
-            .button-container button {
-                font-size: 16px;
-                padding: 12px;
-            }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0e7569;
         }
     </style>
 </head>
-<body>
-    <div class="content">
-        <div class="top-container">
-            <img src="https://www.wedely.com/file/bf0abf4aa17850bfcbc52fe0b927993f2e4fd99924293457a324f5eda4c0a83a" alt="Logo Na Chapa">
-            <h1>Pedidos Na Chapa</h1>
-        </div>
-
-        <div class="insumos-container">
-            <!-- Carnes -->
-            <div class="category">Carnes</div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Hambúrguer"> Hambúrguer</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Picanha"> Picanha</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Maminha"> Maminha</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Bacon"> Bacon</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Asa de frango"> Asa de frango</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Peito de Frango"> Peito de Frango</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="File de Peixe"> File de Peixe</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Carne de porco para bifana"> Carne de porco para bifana</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Carne moida"> Carne moida</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Hambúrguer Enfant"> Hambúrguer Enfant</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Nugget de frango"> Nugget de frango</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Hambúrguer Vegetariano"> Hambúrguer Vegetariano</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Jambon"> Jambon</label></div>
-
-            <!-- Molhos de Queijo -->
-            <div class="category">Molhos de Queijo</div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Creme culinário 15%"> Creme culinário 15%</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Creme culinário 30%"> Creme culinário 30%</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Gorgonzola"> Gorgonzola</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Cheddar Râpé"> Cheddar Râpé</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Cheddar Fatia"> Cheddar Fatia</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Gouda Fatia"> Gouda Fatia</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Provolone"> Provolone</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Emental Râpé"> Emental Râpé</label></div>
-
-            <!-- Hortifruti -->
-            <div class="category">Hortifruti</div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Banana"> Banana</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Morango"> Morango</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Salada"> Salada</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Cenoura"> Cenoura</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Tomate"> Tomate</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Pimentão Vermelho"> Pimentão Vermelho</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Pimentão Amarelo"> Pimentão Amarelo</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Cebola"> Cebola</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Persil"> Persil</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Limão"> Limão</label></div>
-
-            <!-- Sobremesas -->
-            <div class="category">Sobremesas</div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Açai"> Açai</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Chocolate meio amargo"> Chocolate meio amargo</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Chocolate ao leite"> Chocolate ao leite</label></div>
-
-            <!-- Outros -->
-            <div class="category">Outros</div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Granola"> Granola</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Manteiga"> Manteiga</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Azeite Salada"> Azeite Salada</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Óleo fritura"> Óleo fritura</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Mostarda Amarela"> Mostarda Amarela</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Ovos"> Ovos</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Sal (Neve)"> Sal (Neve)</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Sal (Grosso)"> Sal (Grosso)</label></div>
-
-            <!-- Temperos -->
-            <div class="category">Temperos</div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Páprica"> Páprica</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Alho em pó"> Alho em pó</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Pimenta do reino"> Pimenta do reino</label></div>
-
-            <!-- Limpeza -->
-            <div class="category">Limpeza</div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Desengordurante chapa"> Desengordurante chapa</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Detergente"> Detergente</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Sabão máquina de lavar"> Sabão máquina de lavar</label></div>
-            <div class="card"><label><input type="checkbox" name="insumos" value="Desinfetante para o chão"> Desinfetante para o chão</label></div>
-
-            <!-- Observação -->
-            <div class="category">Informações adicionais</div>
-            <div class="card">
-                <textarea rows="4" style="width: 100%; border: unset;" placeholder="Adicione algo que falta na lista..."></textarea>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-4 flex flex-col items-center">
+            <img src="https://www.wedely.com/file/bf0abf4aa17850bfcbc52fe0b927993f2e4fd99924293457a324f5eda4c0a83a" alt="Logo Na Chapa" class="h-16 w-auto">
+            <h1 class="text-2xl font-bold text-gray-800 mt-2">Pedidos Na Chapa</h1>
+            
+            <!-- Search Bar -->
+            <div class="w-full mt-4 relative">
+                <input type="text" id="searchInput" placeholder="Pesquisar itens..." 
+                       class="w-full px-4 py-2 rounded-full border border-gray-300 focus:border-teal-600 search-input">
+                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div class="button-container">
-        <button type="button" id="enviarPedido">
-            <i class="fab fa-whatsapp"></i> Enviar Pedido
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto container mx-auto px-4 py-4 pb-24">
+        <!-- Inventory Status -->
+        <div class="bg-white rounded-lg shadow p-4 mb-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-700">Resumo do Pedido</h2>
+                <span id="selectedCount" class="bg-teal-600 text-white text-xs font-bold px-2 py-1 rounded-full">0 selecionados</span>
+            </div>
+            <div class="mt-2">
+                <div class="bg-teal-100 text-teal-800 p-2 rounded">
+                    <div class="text-sm font-medium">Itens selecionados</div>
+                    <div id="totalSelected" class="text-xl font-bold">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Categories -->
+        <div id="categoriesContainer">
+            <!-- Carnes -->
+            <div class="category-group mb-6">
+                <div class="category-header flex justify-between items-center bg-teal-600 text-white px-4 py-3 rounded-lg cursor-pointer" onclick="toggleCategory('carnes')">
+                    <h2 class="font-bold text-lg"><i class="fas fa-drumstick-bite mr-2"></i>Carnes</h2>
+                    <i class="fas fa-chevron-down transition-transform duration-300" id="carnesIcon"></i>
+                </div>
+                <div class="category-content bg-white rounded-b-lg overflow-hidden" id="carnesContent">
+                    <!-- Hambúrguer -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes" data-stock="30">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Hambúrguer">
+                                    <label class="text-gray-800 font-medium">Hambúrguer</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 30</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Hambúrguer">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Picanha -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes" data-stock="10">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Picanha">
+                                    <label class="text-gray-800 font-medium">Picanha</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 10</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Picanha">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Maminha -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes" data-stock="8">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Maminha">
+                                    <label class="text-gray-800 font-medium">Maminha</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 8</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Maminha">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bacon -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes" data-stock="1">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Bacon">
+                                    <label class="text-gray-800 font-medium">Bacon</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 1</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Bacon">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bacon Fatia (NOVO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes" data-stock="3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Bacon Fatia">
+                                    <label class="text-gray-800 font-medium">Bacon Fatia</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 3</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Bacon Fatia">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Asa de Frango -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes" data-stock="1">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Asa de Frango">
+                                    <label class="text-gray-800 font-medium">Asa de Frango</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 1</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Asa de Frango">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Peito de Frango -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes" data-stock="1">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Peito de Frango">
+                                    <label class="text-gray-800 font-medium">Peito de Frango</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 1</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Peito de Frango">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- File de Peixe (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="File de Peixe">
+                                    <label class="text-gray-800 font-medium">File de Peixe</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="File de Peixe">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Carne de porco para bifana (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Carne de porco para bifana">
+                                    <label class="text-gray-800 font-medium">Carne de porco para bifana</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Carne de porco para bifana">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Carne moida (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Carne moida">
+                                    <label class="text-gray-800 font-medium">Carne moida</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Carne moida">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hambúrguer Enfant (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Hambúrguer Enfant">
+                                    <label class="text-gray-800 font-medium">Hambúrguer Enfant</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Hambúrguer Enfant">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nugget de frango (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Nugget de frango">
+                                    <label class="text-gray-800 font-medium">Nugget de frango</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Nugget de frango">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hambúrguer Vegetariano (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Hambúrguer Vegetariano">
+                                    <label class="text-gray-800 font-medium">Hambúrguer Vegetariano</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Hambúrguer Vegetariano">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Jambon (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Jambon">
+                                    <label class="text-gray-800 font-medium">Jambon</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Jambon">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Toscana (NOVO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="carnes" data-stock="6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Toscana">
+                                    <label class="text-gray-800 font-medium">Toscana</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 6</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Toscana">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Molhos de Queijo -->
+            <div class="category-group mb-6">
+                <div class="category-header flex justify-between items-center bg-teal-600 text-white px-4 py-3 rounded-lg cursor-pointer" onclick="toggleCategory('queijos')">
+                    <h2 class="font-bold text-lg"><i class="fas fa-cheese mr-2"></i>Molhos de Queijo</h2>
+                    <i class="fas fa-chevron-down transition-transform duration-300" id="queijosIcon"></i>
+                </div>
+                <div class="category-content bg-white rounded-b-lg overflow-hidden" id="queijosContent">
+                    <!-- Creme culinário 15% -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="queijos" data-stock="6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Creme culinário 15%">
+                                    <label class="text-gray-800 font-medium">Creme culinário 15%</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 6</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Creme culinário 15%">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Creme culinário 30% -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="queijos" data-stock="6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Creme culinário 30%">
+                                    <label class="text-gray-800 font-medium">Creme culinário 30%</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 6</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Creme culinário 30%">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gorgonzola -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="queijos" data-stock="2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Gorgonzola">
+                                    <label class="text-gray-800 font-medium">Gorgonzola</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 2</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Gorgonzola">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cheddar Râpé -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="queijos" data-stock="1">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Cheddar Râpé">
+                                    <label class="text-gray-800 font-medium">Cheddar Râpé</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 1</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Cheddar Râpé">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cheddar Fatia -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="queijos" data-stock="2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Cheddar Fatia">
+                                    <label class="text-gray-800 font-medium">Cheddar Fatia</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 2</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Cheddar Fatia">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gouda Fatia -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="queijos" data-stock="2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Gouda Fatia">
+                                    <label class="text-gray-800 font-medium">Gouda Fatia</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 2</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Gouda Fatia">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Provolone (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="queijos">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Provolone">
+                                    <label class="text-gray-800 font-medium">Provolone</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Provolone">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Emental Râpé -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="queijos" data-stock="3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Emental Râpé">
+                                    <label class="text-gray-800 font-medium">Emental Râpé</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 3</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Emental Râpé">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hortifruti -->
+            <div class="category-group mb-6">
+                <div class="category-header flex justify-between items-center bg-teal-600 text-white px-4 py-3 rounded-lg cursor-pointer" onclick="toggleCategory('hortifruti')">
+                    <h2 class="font-bold text-lg"><i class="fas fa-leaf mr-2"></i>Hortifruti</h2>
+                    <i class="fas fa-chevron-down transition-transform duration-300" id="hortifrutiIcon"></i>
+                </div>
+                <div class="category-content bg-white rounded-b-lg overflow-hidden" id="hortifrutiContent">
+                    <!-- Banana (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Banana">
+                                    <label class="text-gray-800 font-medium">Banana</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Banana">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Morango (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Morango">
+                                    <label class="text-gray-800 font-medium">Morango</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Morango">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Salada -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti" data-stock="4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Salada">
+                                    <label class="text-gray-800 font-medium">Salada</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 4</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Salada">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cenoura -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti" data-stock="1">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Cenoura">
+                                    <label class="text-gray-800 font-medium">Cenoura</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 1</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Cenoura">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tomate -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti" data-stock="3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Tomate">
+                                    <label class="text-gray-800 font-medium">Tomate</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 3</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Tomate">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pimentão Vermelho (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Pimentão Vermelho">
+                                    <label class="text-gray-800 font-medium">Pimentão Vermelho</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Pimentão Vermelho">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pimentão Amarelo (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Pimentão Amarelo">
+                                    <label class="text-gray-800 font-medium">Pimentão Amarelo</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Pimentão Amarelo">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cebola (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Cebola">
+                                    <label class="text-gray-800 font-medium">Cebola</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Cebola">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Persil (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Persil">
+                                    <label class="text-gray-800 font-medium">Persil</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Persil">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Limão (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="hortifruti">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Limão">
+                                    <label class="text-gray-800 font-medium">Limão</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Limão">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sobremesas (MANTIDO) -->
+            <div class="category-group mb-6">
+                <div class="category-header flex justify-between items-center bg-teal-600 text-white px-4 py-3 rounded-lg cursor-pointer" onclick="toggleCategory('sobremesas')">
+                    <h2 class="font-bold text-lg"><i class="fas fa-ice-cream mr-2"></i>Sobremesas</h2>
+                    <i class="fas fa-chevron-down transition-transform duration-300" id="sobremesasIcon"></i>
+                </div>
+                <div class="category-content bg-white rounded-b-lg overflow-hidden" id="sobremesasContent">
+                    <!-- Açai -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="sobremesas">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Açai">
+                                    <label class="text-gray-800 font-medium">Açai</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Açai">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chocolate meio amargo -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="sobremesas">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Chocolate meio amargo">
+                                    <label class="text-gray-800 font-medium">Chocolate meio amargo</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Chocolate meio amargo">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chocolate ao leite -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="sobremesas">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Chocolate ao leite">
+                                    <label class="text-gray-800 font-medium">Chocolate ao leite</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Chocolate ao leite">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Outros (ATUALIZADO) -->
+            <div class="category-group mb-6">
+                <div class="category-header flex justify-between items-center bg-teal-600 text-white px-4 py-3 rounded-lg cursor-pointer" onclick="toggleCategory('outros')">
+                    <h2 class="font-bold text-lg"><i class="fas fa-box-open mr-2"></i>Outros</h2>
+                    <i class="fas fa-chevron-down transition-transform duration-300" id="outrosIcon"></i>
+                </div>
+                <div class="category-content bg-white rounded-b-lg overflow-hidden" id="outrosContent">
+                    <!-- Granola (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Granola">
+                                    <label class="text-gray-800 font-medium">Granola</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Granola">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Manteiga -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros" data-stock="1">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Manteiga">
+                                    <label class="text-gray-800 font-medium">Manteiga</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 1</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Manteiga">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Azeite Salada (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Azeite Salada">
+                                    <label class="text-gray-800 font-medium">Azeite Salada</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Azeite Salada">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Óleo fritura (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Óleo fritura">
+                                    <label class="text-gray-800 font-medium">Óleo fritura</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Óleo fritura">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mostarda Amarela (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Mostarda Amarela">
+                                    <label class="text-gray-800 font-medium">Mostarda Amarela</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Mostarda Amarela">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ovos (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Ovos">
+                                    <label class="text-gray-800 font-medium">Ovos</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Ovos">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sal (Neve) (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Sal (Neve)">
+                                    <label class="text-gray-800 font-medium">Sal (Neve)</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Sal (Neve)">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sal (Grosso) (MANTIDO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Sal (Grosso)">
+                                    <label class="text-gray-800 font-medium">Sal (Grosso)</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Sal (Grosso)">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Leite condensado (NOVO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros" data-stock="1">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Leite condensado">
+                                    <label class="text-gray-800 font-medium">Leite condensado</label>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-8 mt-1">Estoque mínimo: 1</div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Leite condensado">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Potes açaí (NOVO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Potes açaí">
+                                    <label class="text-gray-800 font-medium">Potes açaí</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Potes açaí">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tampas açaí (NOVO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Tampas açaí">
+                                    <label class="text-gray-800 font-medium">Tampas açaí</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Tampas açaí">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Colheres açaí (NOVO) -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="outros">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Colheres açaí">
+                                    <label class="text-gray-800 font-medium">Colheres açaí</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Colheres açaí">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Temperos (MANTIDO) -->
+            <div class="category-group mb-6">
+                <div class="category-header flex justify-between items-center bg-teal-600 text-white px-4 py-3 rounded-lg cursor-pointer" onclick="toggleCategory('temperos')">
+                    <h2 class="font-bold text-lg"><i class="fas fa-mortar-pestle mr-2"></i>Temperos</h2>
+                    <i class="fas fa-chevron-down transition-transform duration-300" id="temperosIcon"></i>
+                </div>
+                <div class="category-content bg-white rounded-b-lg overflow-hidden" id="temperosContent">
+                    <!-- Páprica -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="temperos">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Páprica">
+                                    <label class="text-gray-800 font-medium">Páprica</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Páprica">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Alho em pó -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="temperos">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Alho em pó">
+                                    <label class="text-gray-800 font-medium">Alho em pó</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Alho em pó">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pimenta do reino -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="temperos">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Pimenta do reino">
+                                    <label class="text-gray-800 font-medium">Pimenta do reino</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Pimenta do reino">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Limpeza (MANTIDO) -->
+            <div class="category-group mb-6">
+                <div class="category-header flex justify-between items-center bg-teal-600 text-white px-4 py-3 rounded-lg cursor-pointer" onclick="toggleCategory('limpeza')">
+                    <h2 class="font-bold text-lg"><i class="fas fa-broom mr-2"></i>Limpeza</h2>
+                    <i class="fas fa-chevron-down transition-transform duration-300" id="limpezaIcon"></i>
+                </div>
+                <div class="category-content bg-white rounded-b-lg overflow-hidden" id="limpezaContent">
+                    <!-- Desengordurante chapa -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="limpeza">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Desengordurante chapa">
+                                    <label class="text-gray-800 font-medium">Desengordurante chapa</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Desengordurante chapa">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detergente -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="limpeza">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Detergente">
+                                    <label class="text-gray-800 font-medium">Detergente</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Detergente">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sabão máquina de lavar -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="limpeza">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Sabão máquina de lavar">
+                                    <label class="text-gray-800 font-medium">Sabão máquina de lavar</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Sabão máquina de lavar">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Desinfetante para o chão -->
+                    <div class="item-card border-b border-gray-100 p-3 hover:bg-gray-50 transition-all duration-200" data-category="limpeza">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="item-checkbox h-5 w-5 text-teal-600 rounded mr-3" data-name="Desinfetante para o chão">
+                                    <label class="text-gray-800 font-medium">Desinfetante para o chão</label>
+                                </div>
+                            </div>
+                            <div class="quantity-control flex items-center">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, -1)">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <input type="number" min="0" value="0" class="quantity-input mx-2 w-12 text-center border border-gray-300 rounded h-8" data-name="Desinfetante para o chão">
+                                <button class="quantity-btn bg-gray-200 text-gray-700 h-8 w-8 rounded-full flex items-center justify-center" onclick="adjustQuantity(this, 1)">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Notes -->
+        <div class="bg-white rounded-lg shadow p-4 mt-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2"><i class="fas fa-edit mr-2"></i>Observações</h2>
+            <textarea id="additionalNotes" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500" rows="4" placeholder="Adicione algo que falta na lista ou informações importantes..."></textarea>
+        </div>
+    </main>
+
+    <!-- Fixed Bottom Button -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 p-4">
+        <button id="sendOrderBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition-colors duration-300">
+            <i class="fab fa-whatsapp text-xl mr-2"></i>
+            <span>Enviar Pedido</span>
+            <span id="orderBadge" class="ml-2 bg-white text-teal-600 text-xs font-bold px-2 py-1 rounded-full">0</span>
         </button>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        // DOM Ready
         $(document).ready(function() {
-            $("#enviarPedido").click(function() {
-                var insumosSelecionados = [];
-                $("input[name='insumos']:checked").each(function() {
-                    insumosSelecionados.push($(this).val());
-                });
-
-                var observacao = $("textarea").val();
-                if (insumosSelecionados.length > 0 || observacao.trim() !== "") {
-                    
-                    var mensagem = "*Pedido de compra*";
-                    
-                    if (insumosSelecionados.length > 0){
-                       mensagem = "*Pedido de compra*\n\n" + insumosSelecionados.join("\n");
+            // Update counters initially
+            updateCounters();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Initialize all categories as expanded
+            $('.category-content').css('max-height', '1000px');
+        });
+        
+        function setupEventListeners() {
+            // Checkbox change
+            $('.item-checkbox').change(function() {
+                const itemCard = $(this).closest('.item-card');
+                const quantityInput = itemCard.find('.quantity-input');
+                
+                if ($(this).is(':checked')) {
+                    if (parseInt(quantityInput.val()) === 0) {
+                        quantityInput.val(1);
                     }
-                    
-                    if (observacao) {
-
-                       if (insumosSelecionados.length > 0){mensagem += "\n\n*Pedidos adicionais*";}
-
-                        mensagem += "\n\n" + observacao;
-                    }
-
-                    var url = "https://wa.me/?text=" + encodeURIComponent(mensagem);
-                    window.open(url, "_blank");
-
-                    // Limpar checkboxes e caixa de texto
-                    $("input[name='insumos']").prop("checked", false);
-                    $("textarea").val("");
+                    itemCard.addClass('bg-teal-50');
                 } else {
-                    alert("Selecione pelo menos um item ou adicione uma observação.");
+                    quantityInput.val(0);
+                    itemCard.removeClass('bg-teal-50');
+                }
+                
+                updateCounters();
+            });
+            
+            // Quantity input change
+            $('.quantity-input').change(function() {
+                const value = parseInt($(this).val());
+                const checkbox = $(this).closest('.item-card').find('.item-checkbox');
+                
+                if (value > 0) {
+                    checkbox.prop('checked', true);
+                    $(this).closest('.item-card').addClass('bg-teal-50');
+                } else {
+                    checkbox.prop('checked', false);
+                    $(this).closest('.item-card').removeClass('bg-teal-50');
+                }
+                
+                updateCounters();
+            }).on('keypress', function(e) {
+                // Allow only numbers
+                if (e.which < 48 || e.which > 57) {
+                    e.preventDefault();
                 }
             });
-        });
+            
+            // Search functionality
+            $('#searchInput').on('keyup', function() {
+                const searchTerm = $(this).val().toLowerCase();
+                
+                if (searchTerm.length > 0) {
+                    $('.item-card').each(function() {
+                        const itemName = $(this).find('label').text().toLowerCase();
+                        if (itemName.includes(searchTerm)) {
+                            $(this).show();
+                            // Expand parent category
+                            const categoryContent = $(this).closest('.category-content');
+                            categoryContent.css('max-height', '1000px');
+                            // Update chevron icon
+                            const categoryId = categoryContent.attr('id');
+                            $(`#${categoryId.replace('Content', 'Icon')}`).removeClass('fa-chevron-down').addClass('fa-chevron-up');
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                } else {
+                    $('.item-card').show();
+                }
+            });
+            
+            // Send order button
+            $('#sendOrderBtn').click(function() {
+                sendOrder();
+            });
+        }
+        
+        function adjustQuantity(button, change) {
+            const quantityInput = $(button).siblings('.quantity-input');
+            let newValue = parseInt(quantityInput.val()) + change;
+            
+            // Ensure value doesn't go below 0
+            newValue = Math.max(0, newValue);
+            quantityInput.val(newValue).trigger('change');
+            
+            // Add visual feedback
+            $(button).addClass('bg-teal-200');
+            setTimeout(() => {
+                $(button).removeClass('bg-teal-200');
+            }, 200);
+        }
+        
+        function toggleCategory(categoryId) {
+            const content = $(`#${categoryId}Content`);
+            const icon = $(`#${categoryId}Icon`);
+            
+            if (content.css('max-height') === '0px') {
+                content.css('max-height', '1000px');
+                icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+            } else {
+                content.css('max-height', '0px');
+                icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            }
+        }
+        
+        function updateCounters() {
+            // Count selected items
+            const selectedItems = $('.item-checkbox:checked').length;
+            $('#selectedCount').text(selectedItems);
+            $('#orderBadge').text(selectedItems);
+            
+            // Calculate total quantity
+            let totalQuantity = 0;
+            $('.quantity-input').each(function() {
+                totalQuantity += parseInt($(this).val());
+            });
+            $('#totalSelected').text(totalQuantity);
+            
+            // Update button state
+            if (selectedItems > 0 || $('#additionalNotes').val().trim() !== '') {
+                $('#sendOrderBtn').removeClass('bg-gray-400').addClass('bg-teal-600 hover:bg-teal-700');
+            } else {
+                $('#sendOrderBtn').removeClass('bg-teal-600 hover:bg-teal-700').addClass('bg-gray-400');
+            }
+        }
+        
+        function sendOrder() {
+            const selectedItems = [];
+            let hasItems = false;
+            
+            // Get all selected items with quantities
+            $('.item-card').each(function() {
+                const checkbox = $(this).find('.item-checkbox');
+                if (checkbox.is(':checked')) {
+                    const itemName = checkbox.data('name');
+                    const quantity = $(this).find('.quantity-input').val();
+                    selectedItems.push(`${itemName} - Qtd: ${quantity}`);
+                    hasItems = true;
+                }
+            });
+            
+            const notes = $('#additionalNotes').val().trim();
+            
+            if (!hasItems && notes === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nada para enviar',
+                    text: 'Selecione pelo menos um item ou adicione uma observação.',
+                    confirmButtonColor: '#128C7E'
+                });
+                return;
+            }
+            
+            // Build WhatsApp message
+            let message = '*PEDIDO DE COMPRA - NA CHAPA*\n\n';
+            
+            if (hasItems) {
+                message += '*ITENS SOLICITADOS:*\n';
+                message += selectedItems.join('\n');
+            }
+            
+            if (notes !== '') {
+                if (hasItems) message += '\n\n';
+                message += '*OBSERVAÇÕES:*\n';
+                message += notes;
+            }
+            
+            // Encode for URL
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+            
+            // Open WhatsApp in new tab
+            window.open(whatsappUrl, '_blank');
+            
+            // Show confirmation
+            Swal.fire({
+                icon: 'success',
+                title: 'Pedido enviado!',
+                text: 'O pedido foi enviado para o WhatsApp.',
+                confirmButtonColor: '#128C7E',
+                timer: 3000,
+                timerProgressBar: true
+            }).then(() => {
+                // Reset form
+                $('.item-checkbox').prop('checked', false);
+                $('.quantity-input').val(0);
+                $('.item-card').removeClass('bg-teal-50');
+                $('#additionalNotes').val('');
+                updateCounters();
+            });
+        }
     </script>
 </body>
 </html>
