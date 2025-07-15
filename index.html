@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pedidos Na Chapa</title>
     <link rel="icon" href="https://www.wedely.com/file/bf0abf4aa17850bfcbc52fe0b927993f2e4fd99924293457a324f5eda4c0a83a" type="image/x-icon">
     
@@ -12,6 +12,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#128C7E">
     <link rel="apple-touch-icon" href="https://www.wedely.com/file/bf0abf4aa17850bfcbc52fe0b927993f2e4fd99924293457a324f5eda4c0a83a">
+    
+    <!-- iOS specific meta tags -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
     
     <!-- CDNs -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,6 +32,7 @@
         
         .quantity-btn {
             transition: all 0.2s ease;
+            touch-action: manipulation; /* Prevents zoom on double-tap */
         }
         
         .quantity-btn:active {
@@ -63,6 +68,18 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #0e7569;
         }
+        
+        /* Prevent zoom on input focus in iOS */
+        input, textarea {
+            font-size: 16px !important;
+        }
+        
+        /* Fix for iOS form elements */
+        @supports (-webkit-touch-callout: none) {
+            input, textarea {
+                font-size: 16px !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
@@ -75,7 +92,8 @@
             <!-- Search Bar -->
             <div class="w-full mt-4 relative">
                 <input type="text" id="searchInput" placeholder="Pesquisar itens..." 
-                       class="w-full px-4 py-2 rounded-full border border-gray-300 focus:border-teal-600 search-input">
+                       class="w-full px-4 py-2 rounded-full border border-gray-300 focus:border-teal-600 search-input"
+                       inputmode="search">
                 <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
             </div>
         </div>
@@ -1427,13 +1445,23 @@
                         }
                     });
                 } else {
+                    // When search is cleared, reset all items
                     $('.item-card').show();
+                    $('.item-checkbox').prop('checked', false);
+                    $('.quantity-input').val(0);
+                    $('.item-card').removeClass('bg-teal-50');
+                    updateCounters();
                 }
             });
             
             // Send order button
             $('#sendOrderBtn').click(function() {
                 sendOrder();
+            });
+            
+            // Prevent zoom on double-tap for quantity buttons
+            $('.quantity-btn').on('touchstart', function(e) {
+                e.preventDefault();
             });
         }
         
